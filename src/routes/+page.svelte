@@ -2,6 +2,7 @@
   import { onMount, tick } from "svelte";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { invoke } from "@tauri-apps/api/core";
+  import { open } from "@tauri-apps/plugin-shell";
   import { 
     Home, 
     Settings, 
@@ -32,6 +33,8 @@
   import { Separator } from "$lib/components/ui/separator";
   import { Badge } from "$lib/components/ui/badge";
   import { ScrollArea } from "$lib/components/ui/scroll-area";
+  import { Slider } from "$lib/components/ui/slider/index.js";
+  import { Progress } from "$lib/components/ui/progress/index.js";
   import * as Card from "$lib/components/ui/card";
   import * as Alert from "$lib/components/ui/alert";
   import * as Select from "$lib/components/ui/select";
@@ -289,6 +292,14 @@
     return;
   }
 
+  async function openGithub() {
+    await open("https://github.com/librekeys/picoforge");
+  }
+
+  async function openWebsite() {
+    await open("https://github.com/librekeys/picoforge");
+  }
+
   onMount(() => {
     document.documentElement.classList.add("dark");
     addLog("Application started.", "info");
@@ -313,7 +324,7 @@
   
   <header 
     data-tauri-drag-region 
-    class="h-10 bg-muted/50 border-b flex items-center justify-between px-4 select-none"
+    class="h-10 bg-muted/50 border-b flex items-center justify-between px-2 select-none"
   >
     <div class="text-xs font-medium text-muted-foreground pointer-events-none flex items-center gap-2">
     </div>
@@ -461,12 +472,11 @@
                         <div class="text-2xl font-bold">
                           {deviceConnected ? `${deviceInfo.flashUsed} / ${deviceInfo.flashTotal} KB` : "---"}
                         </div>
-                        <div class="w-full bg-secondary h-1.5 mt-3 rounded-full overflow-hidden">
-                          <div 
-                            class="bg-primary h-full transition-all duration-500" 
-                            style={`width: ${deviceConnected && deviceInfo.flashTotal > 0 ? (deviceInfo.flashUsed / deviceInfo.flashTotal) * 100 : 0}%`}>
-                          </div>
-                        </div>
+                        <Progress 
+                          value={deviceConnected && deviceInfo.flashTotal > 0 ? (deviceInfo.flashUsed / deviceInfo.flashTotal) * 100 : 0} 
+                          max={100} 
+                          class="mt-3"
+                        />
                       </Card.Content>
                     </Card.Root>
 
@@ -633,12 +643,12 @@
                         <Switch id="power-cycle" bind:checked={config.powerCycleOnReset} disabled={!deviceConnected} />
                     </div>
 
-                   <div class="space-y-3 pt-4">
+                    <div class="space-y-3 pt-4">
                       <div class="flex justify-between">
-                          <Label>LED Brightness (0-15)</Label>
-                          <span class="text-xs text-muted-foreground">Level {config.ledBrightness}</span>
+                        <Label>LED Brightness (0-15)</Label>
+                        <span class="text-xs text-muted-foreground">Level {config.ledBrightness}</span>
                       </div>
-                      <Input type="range" min="0" max="15" bind:value={config.ledBrightness} disabled={!deviceConnected} />
+                      <Slider type="single" bind:value={config.ledBrightness} max={15} step={1} disabled={!deviceConnected} />
                     </div>
                   </Card.Content>
                   <Card.Footer class="border-t bg-muted/20 px-6 py-4 flex justify-end">
@@ -776,16 +786,16 @@
                          <div class="flex justify-between"><span>Artwork:</span> <span class="font-medium text-foreground">Suyog Tandel</span></div>
                          <div class="flex justify-between items-center pt-2 mt-2 border-t border-dashed">
                             <span class="flex items-center gap-1"><Copyright class="h-3 w-3" /> Copyright:</span> 
-                            <span class="font-medium text-foreground">2026 Suyog Tandel</span>
+                            <span class="font-medium text-foreground">2026  Suyog Tandel</span>
                          </div>
                       </div>
 
                       <div class="flex gap-4 pt-6">
-                        <Button variant="outline" size="sm" class="gap-2">
+                        <Button variant="outline" size="sm" class="gap-2" onclick={openGithub}>
                           <Github class="h-4 w-4" />
                             GitHub
                           </Button>
-                        <Button variant="outline" size="sm" class="gap-2">
+                        <Button variant="outline" size="sm" class="gap-2 onclick={openWebsite}">
                           <Home class="h-4 w-4" />
                             Website
                           </Button>
