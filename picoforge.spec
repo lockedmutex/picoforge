@@ -72,7 +72,7 @@ install -m 644 src-tauri/icons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %files
 %{_bindir}/%{name}
 %{_datadir}/applications/%{name}.desktop
-%{_datadir}/icons/hicolor/scalable/apps/%{name}.png
+%{_datadir}/icons/hicolor/scalable/apps/in.suyogtandel.picoforge.svg
 
 %changelog
 * Sat Jan 17 2026 Suyog Tandel <git@suyogtandel.in> 0.2.2-1
