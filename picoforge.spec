@@ -75,5 +75,8 @@ install -m 644 src-tauri/icons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %{_datadir}/icons/hicolor/scalable/apps/in.suyogtandel.picoforge.svg
 
 %changelog
+* Sat Jan 17 2026 Suyog Tandel <git@suyogtandel.in> 0.2.1-1
+- new package built with tito
+
 * Fri Jan 16 2026 Suyog Tandel <git@suyogtandel.in> 0.2.1-1
 - Initial release
