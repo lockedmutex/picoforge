@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { invoke } from "@tauri-apps/api/core";
-  import { listen } from "@tauri-apps/api/event";
+  import { getCurrentWindow } from "@tauri-apps/api/window";
 
   import { Home, Info, KeyRound, Maximize, Minimize, Minus, RefreshCw, ScrollText, Settings, ShieldCheck, X } from "@lucide/svelte";
   import type { Component } from "svelte";
@@ -23,9 +22,8 @@
   let { currentView, onViewChange, children }: Props = $props();
 
   let isMaximized = $state(false);
-  let unlistenWindowState: (() => void) | undefined;
 
-  // const appWindow = getCurrentWindow();
+  const appWindow = getCurrentWindow();
 
   const menuItems: Array<{ view: View; icon: Component; label: string }> = [
     { view: "home", icon: Home, label: "Home" },
@@ -36,21 +34,30 @@
     { view: "about", icon: Info, label: "About" },
   ];
 
-  onMount(() => {
-    const setupWindow = async () => {
-      isMaximized = await invoke("get_window_maximized");
+  function minimize() {
+    appWindow.minimize();
+  }
 
-      unlistenWindowState = await listen<{ isMaximized: boolean }>("window-state-changed", (event) => {
-        isMaximized = event.payload.isMaximized;
+  async function toggleMaximize() {
+    await appWindow.toggleMaximize();
+  }
+
+  function closeApp() {
+    appWindow.close();
+  }
+
+  onMount(() => {
+    const handleResize = () => {
+      appWindow.isMaximized().then((maximized) => {
+        isMaximized = maximized;
       });
     };
-
-    setupWindow();
-
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    
     return () => {
-      if (unlistenWindowState) {
-        unlistenWindowState();
-      }
+      window.removeEventListener("resize", handleResize);
     };
   });
 </script>
@@ -119,11 +126,11 @@
       </div>
 
       <div class="flex items-center gap-1">
-        <Button variant="ghost" size="icon" class="h-8 w-8 hover:bg-muted" onclick={() => invoke("minimize_window")}>
+        <Button variant="ghost" size="icon" class="h-8 w-8 hover:bg-muted" onclick={minimize}>
           <Minus class="h-4 w-4" />
         </Button>
 
-        <Button variant="ghost" size="icon" class="h-8 w-8 hover:bg-muted" onclick={() => invoke("toggle_maximize_window")}>
+        <Button variant="ghost" size="icon" class="h-8 w-8 hover:bg-muted" onclick={toggleMaximize}>
           {#if isMaximized}
             <Minimize class="h-3.5 w-3.5 rotate-180" />
           {:else}
@@ -135,7 +142,7 @@
           variant="ghost"
           size="icon"
           class="h-8 w-8 hover:bg-red-500 hover:text-white transition-colors"
-          onclick={() => invoke("close_window")}
+          onclick={closeApp}
         >
           <X class="h-4 w-4" />
         </Button>
