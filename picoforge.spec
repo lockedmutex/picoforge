@@ -53,7 +53,7 @@ export PATH="$DENO_INSTALL/bin:$PATH"
 # Build the App
 # This will download Rust crates and Deno modules over the internet
 deno install
-deno task tauri build --target release
+deno task tauri build
 
 %install
 mkdir -p %{buildroot}%{_bindir}
