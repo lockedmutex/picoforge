@@ -1,5 +1,5 @@
 Name:           picoforge
-Version:        0.2.1
+Version:        0.2.2
 Release:        1%{?dist}
 Summary:        An open source commissioning tool for Pico FIDO security keys. Developed with Rust, Tauri, and Svelte.
 License:        AGPL-3.0
@@ -75,5 +75,8 @@ install -m 644 src-tauri/icons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %{_datadir}/icons/hicolor/scalable/apps/%{name}.png
 
 %changelog
+* Sat Jan 17 2026 Suyog Tandel <git@suyogtandel.in> 0.2.2-1
+- new package built with tito
+
 * Fri Jan 16 2026 Suyog Tandel <git@suyogtandel.in> 0.2.1-1
 - Initial release
