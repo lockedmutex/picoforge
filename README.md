@@ -144,6 +144,30 @@ The compiled binaries will be available in:
 - **macOS**: `src-tauri/target/release/bundle/dmg/`
 - **Windows**: `src-tauri/target/release/bundle/`
 
+## Building with Nix
+
+[Nix](https://nixos.org/) is a powerful package manager that provides clean, reproducible builds. You can use Nix to build picoforge painlessly.
+
+### 1. Install Nix
+
+Follow the [official installation guide](https://nixos.org/download/#download-nix).
+
+### 2. Download the package definition
+
+```bash
+curl -O https://raw.githubusercontent.com/librekeys/picoforge/main/package.nix
+```
+
+### 3. Build the project
+
+Run the following command in the directory containing `package.nix`:
+
+```bash
+nix-build -E 'with import <nixpkgs> {}; callPackage ./package.nix { }'
+```
+
+The compiled binary will be available at: `result/bin/picoforge`
+
 ## Project Structure
 
 ```
