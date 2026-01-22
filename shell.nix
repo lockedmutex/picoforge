@@ -15,6 +15,7 @@ let
     webkitgtk_4_1
     pcsclite
     hidapi
+    mesa 
   ];
 
   packages = with pkgs; [
@@ -57,6 +58,10 @@ pkgs.mkShell {
   shellHook = ''
     export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath libraries}:$LD_LIBRARY_PATH
     export XDG_DATA_DIRS=$GSETTINGS_SCHEMAS_PATH:$XDG_DATA_DIRS
+    
+    # Try to uncomment the following lines if you encounter EGL_BAD_PARAMETER errors:
+    # export LIBGL_ALWAYS_SOFTWARE=1
+    # export WEBKIT_DISABLE_COMPOSITING_MODE=1
     
     echo "Nix development environment loaded!"
     echo "Available tools: rustc, cargo, deno, node, tauri"

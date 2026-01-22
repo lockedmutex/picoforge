@@ -49,14 +49,14 @@
             </Button>
           </div>
 
-          <div class="flex items-center justify-between p-4 border rounded-lg opacity-60">
+          <div class="flex items-center justify-between p-4 border rounded-lg">
             <div class="space-y-1">
               <p class="font-medium">Minimum PIN Length</p>
               <p class="text-sm text-muted-foreground">
                 Current: {device.fidoInfo?.minPinLength || 4} characters
               </p>
             </div>
-            <Button variant="outline" disabled={true}>Update Minimum Length</Button>
+            <Button variant="outline" disabled={!device.fidoInfo?.options?.clientPin} onclick={() => state.openMinPinDialog()}>Update Minimum Length</Button>
           </div>
         </Card.Content>
       </Card.Root>
