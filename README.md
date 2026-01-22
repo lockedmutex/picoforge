@@ -168,6 +168,10 @@ nix-build -E 'with import <nixpkgs> {}; callPackage ./package.nix { }'
 
 The compiled binary will be available at: `result/bin/picoforge`
 
+### 4. Nix-shell developement environment
+Alternatively, you can use the shell.nix file that is at the root of the repository to enter a developement environement with all the required dependencies by simply running `nix-shell`
+Then you can build from source and run the application with `deno task tauri dev`.
+
 ## Project Structure
 
 ```

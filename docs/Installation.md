@@ -47,6 +47,10 @@ Regardless of the installation method you choose below, your **host operating sy
 # Command may vary by distro, commonly:
 sudo systemctl enable --now pcscd
 ```
+To have the pcscd service, you may need to install pcsc-lite if it is not installed by default on your Linux distribution.
+- On Debian : `sudo apt install pcscd`
+- On NixOS, add this line in your /etc/nixos/configuration.nix : `services.pcscd.enable = true;`
+
 
 ### Option 1: [COPR Repository](https://copr.fedorainfracloud.org/coprs/lockedmutex/picoforge/) (Recommended for Fedora, openSUSE, and RHEL-based distros)
 
