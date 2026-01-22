@@ -12,3 +12,7 @@ vite.config.ts.timestamp-*
 
 # IDE:
 .vscode
+
+# Nix
+result
+.direnv
