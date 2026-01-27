@@ -32,14 +32,16 @@ gpui = "0.2.2"
 gpui-component = "0.5.0"
 # Optional, for default bundled assets
 gpui-component-assets = "0.5.0"
+rust-embed = "8.11.0"
 
 [profile.dev]
 incremental = true     # Compile your binary in smaller steps.
 codegen-units = 256
+opt-level = 1
 
 [profile.release]
 codegen-units = 1 # Allows LLVM to perform better optimization.
 lto = true        # Enables link-time-optimizations however is not stable.
 opt-level = 3     # Prioritizes speed. Use `z` if you prefer small binary size.
-# panic = "abort"   # Higher performance by disabling panic handlers.
+panic = "abort"   # Higher performance by disabling panic handlers.
 strip = true      # Ensures debug symbols are removed.

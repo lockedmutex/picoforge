@@ -49,7 +49,7 @@ pub struct HomeView;
 
 impl HomeView {
 	pub fn build(theme: &Theme) -> impl IntoElement {
-		// Mock Data
+		// Mock Data, I will replace this with fetching of actual data later, kinda bored rn.
 		let device = DeviceState {
 			connected: true,
 			method: "HID".to_string(),
@@ -60,8 +60,8 @@ impl HomeView {
 				flash_total: 2048.0,
 			},
 			config: DeviceConfig {
-				vid: 0xCAFE,
-				pid: 0xBABE,
+				vid: 0x0000,
+				pid: 0x0000,
 				product_name: "Pico FIDO Key".to_string(),
 				led_gpio: 25,
 				led_brightness: 128,
@@ -88,69 +88,62 @@ impl HomeView {
 			.bg(theme.background)
 			.flex()
 			.flex_col()
-			.items_center() // Center the content
+			.items_center()
 			.child(
-				div()
-					.w_full()
-					.max_w(px(1400.0)) // Max width constraint
-					.px_16() // Big padding on sides
-					.py_10()
-					.child(
-						v_flex()
-							.gap_8()
-							// Header Section
-							.child(
-								v_flex()
-									.gap_1()
-									.child(
-										div()
-											.text_xl()
-											.font_bold()
-											.text_color(theme.foreground)
-											.child("Device Overview"),
-									)
-									.child(
-										div().text_sm().text_color(theme.muted_foreground).child(
-											"Quick view of your device status and specifications.",
-										),
+				div().w_full().max_w(px(1400.0)).px_10().py_5().child(
+					v_flex()
+						.gap_8()
+						.child(
+							v_flex()
+								.child(
+									div()
+										.text_3xl()
+										.font_extrabold()
+										.text_color(theme.foreground)
+										.child("Device Overview"),
+								)
+								.child(
+									div().text_sm().text_color(theme.muted_foreground).child(
+										"Quick view of your device status and specifications.",
 									),
-							)
-							// Content Section
-							.child(if !device.connected {
-								// No Device Status Placeholder
-								div()
-									.flex()
-									.items_center()
-									.justify_center()
-									.h_64()
-									.border_1()
-									.border_color(theme.border)
-									.rounded_xl()
-									.child(
-										div()
-											.text_color(theme.muted_foreground)
-											.child("No Device Connected"),
-									)
-									.into_any_element()
-							} else {
-								// 4 Card Grid
-								div()
-									.grid()
-									.grid_cols(2)
-									.gap_6()
-									.child(Self::render_device_info(&device, theme))
-									.child(Self::render_fido_info(&device, theme))
-									.child(Self::render_led_config(&device, theme))
-									.child(Self::render_security_status(&device, theme))
-									.into_any_element()
-							}),
-					),
+								),
+						)
+						// Content Section
+						.child(if !device.connected {
+							// No Device Status Placeholder
+							div()
+								.flex()
+								.items_center()
+								.justify_center()
+								.h_64()
+								.border_1()
+								.border_color(theme.border)
+								.rounded_xl()
+								.child(
+									div()
+										.text_color(theme.muted_foreground)
+										.child("No Device Connected"),
+								)
+								.into_any_element()
+						} else {
+							// 4 Card Grid
+							div()
+								.grid()
+								.grid_cols(2)
+								.gap_6()
+								.child(Self::render_device_info(&device, theme))
+								.child(Self::render_fido_info(&device, theme))
+								.child(Self::render_led_config(&device, theme))
+								.child(Self::render_security_status(&device, theme))
+								.into_any_element()
+						}),
+				),
 			)
 	}
 
-	fn render_card(
+	fn home_card(
 		title: &str,
-		icon: IconName,
+		icon: Icon,
 		content: impl IntoElement,
 		theme: &Theme,
 	) -> impl IntoElement {
@@ -213,9 +206,9 @@ impl HomeView {
 	fn render_device_info(device: &DeviceState, theme: &Theme) -> impl IntoElement {
 		let flash_percent = (device.info.flash_used / device.info.flash_total) * 100.0;
 
-		Self::render_card(
+		Self::home_card(
 			"Device Information",
-			IconName::SquareTerminal,
+			Icon::default().path("icons/cpu.svg"),
 			v_flex()
 				.gap_6()
 				.child(
@@ -275,9 +268,9 @@ impl HomeView {
 	}
 
 	fn render_fido_info(device: &DeviceState, theme: &Theme) -> impl IntoElement {
-		Self::render_card(
+		Self::home_card(
 			"FIDO2 Information",
-			IconName::Info,
+			Icon::default().path("icons/shield.svg"),
 			if let Some(fido) = &device.fido_info {
 				v_flex()
 					.gap_6()
@@ -330,9 +323,9 @@ impl HomeView {
 	}
 
 	fn render_led_config(device: &DeviceState, theme: &Theme) -> impl IntoElement {
-		Self::render_card(
+		Self::home_card(
 			"LED Configuration",
-			IconName::LayoutDashboard,
+			Icon::default().path("icons/microchip.svg"),
 			if device.method == "FIDO" {
 				v_flex()
 					.items_center()
@@ -436,9 +429,9 @@ impl HomeView {
 	}
 
 	fn render_security_status(device: &DeviceState, theme: &Theme) -> impl IntoElement {
-		Self::render_card(
+		Self::home_card(
 			"Security Status",
-			IconName::CircleCheck,
+			Icon::default().path("icons/shield-check.svg"),
 			v_flex()
 				.gap_3()
 				.text_sm()
