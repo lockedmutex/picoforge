@@ -60,8 +60,8 @@ impl Render for ApplicationRoot {
                         header
                             .child(
                                 img("appIcons/in.suyogtandel.picoforge.svg")
-                                    .w(px(48.))
-                                    .h(px(48.)),
+                                    .w(if self.collapsed { px(32.) } else { px(48.) })
+                                    .h(if self.collapsed { px(32.) } else { px(48.) }),
                             )
                             .children(if !self.collapsed {
                                 Some(

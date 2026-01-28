@@ -49,7 +49,7 @@ fn main() {
 
                 window_min_size: Some(gpui::Size {
                     width: px(650.),
-                    height: px(300.),
+                    height: px(400.),
                 }),
                 kind: WindowKind::Normal,
                 ..Default::default()
