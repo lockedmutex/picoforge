@@ -122,7 +122,7 @@ impl Render for ApplicationRoot {
                                         ConfigView::build().into_any_element()
                                     }
                                     ActiveView::Security => {
-                                        SecurityView::build().into_any_element()
+                                        SecurityView::build(cx).into_any_element()
                                     }
                                     ActiveView::Logs => LogsView::build().into_any_element(),
                                     ActiveView::About => {
