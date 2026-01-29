@@ -1,4 +1,5 @@
 // use crate::device::types::*;
+use crate::ui::components::page_view::PageView;
 use gpui::*;
 use gpui_component::StyledExt;
 use gpui_component::{Icon, IconName, Theme, badge::Badge, h_flex, progress::Progress, v_flex};
@@ -83,62 +84,39 @@ impl HomeView {
             },
         };
 
-        div()
-            .size_full()
-            .bg(theme.background)
-            .flex()
-            .flex_col()
-            .items_center()
-            .child(
-                div().w_full().max_w(px(1200.0)).px_10().py_5().child(
-                    v_flex()
-                        .gap_8()
-                        .child(
-                            v_flex()
-                                .child(
-                                    div()
-                                        .text_3xl()
-                                        .font_extrabold()
-                                        .text_color(theme.foreground)
-                                        .child("Device Overview"),
-                                )
-                                .child(
-                                    div().text_sm().text_color(theme.muted_foreground).child(
-                                        "Quick view of your device status and specifications.",
-                                    ),
-                                ),
-                        )
-                        // Content Section
-                        .child(if !device.connected {
-                            // No Device Status Placeholder
-                            div()
-                                .flex()
-                                .items_center()
-                                .justify_center()
-                                .h_64()
-                                .border_1()
-                                .border_color(theme.border)
-                                .rounded_xl()
-                                .child(
-                                    div()
-                                        .text_color(theme.muted_foreground)
-                                        .child("No Device Connected"),
-                                )
-                                .into_any_element()
-                        } else {
-                            // 4 Card Grid
-                            div()
-                                .grid()
-                                .grid_cols(2)
-                                .gap_6()
-                                .child(Self::render_device_info(&device, theme))
-                                .child(Self::render_fido_info(&device, theme))
-                                .child(Self::render_led_config(&device, theme))
-                                .child(Self::render_security_status(&device, theme))
-                                .into_any_element()
-                        }),
-                ),
-            )
+        PageView::build(
+            "Device Overview",
+            "Quick view of your device status and specifications.",
+            if !device.connected {
+                // No Device Status Placeholder
+                div()
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .h_64()
+                    .border_1()
+                    .border_color(theme.border)
+                    .rounded_xl()
+                    .child(
+                        div()
+                            .text_color(theme.muted_foreground)
+                            .child("No Device Connected"),
+                    )
+                    .into_any_element()
+            } else {
+                // 4 Card Grid
+                div()
+                    .grid()
+                    .grid_cols(2)
+                    .gap_6()
+                    .child(Self::render_device_info(&device, theme))
+                    .child(Self::render_fido_info(&device, theme))
+                    .child(Self::render_led_config(&device, theme))
+                    .child(Self::render_security_status(&device, theme))
+                    .into_any_element()
+            },
+            theme,
+        )
     }
 
     fn home_card(
@@ -174,7 +152,7 @@ impl HomeView {
             )
     }
 
-    // --- Helper for Key-Value pairs ---
+    // Helper for Key-Value pairs
     fn render_kv(
         label: &str,
         value: impl IntoElement,
