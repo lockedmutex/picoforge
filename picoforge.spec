@@ -79,6 +79,61 @@ install -m 644 src-tauri/icons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %{_datadir}/icons/hicolor/scalable/apps/in.suyogtandel.picoforge.svg
 
 %changelog
+* Thu Jan 29 2026 Suyog Tandel <git@suyogtandel.in> 0.3.1-1
+- chore: sync spec to 0.3.1 [skip ci] (git@suyogtandel.in)
+- chore(ci/cd): add workflow_dispatch to release workflow (git@suyogtandel.in)
+- fix(ci/cd): build failure in release workflow due to git (git@suyogtandel.in)
+- fix(ci/cd): tito build commit on github actions (git@suyogtandel.in)
+- chore: bump app version to 0.3.1 (git@suyogtandel.in)
+- chore(docs): Update Home.md and Installation.md with more info
+  (git@suyogtandel.in)
+- fix clippy warnings (fabrice.bellamy@distrilab.fr)
+- Update the frontend save method to return the message received from the
+  backend write_config command instead of a hardcoded string.
+  (fabrice.bellamy@distrilab.fr)
+- add debug logs in fido code (fabrice.bellamy@distrilab.fr)
+- do not display the content of LED Configuration card when in fido fallback
+  mode (fabrice.bellamy@distrilab.fr)
+- change FullDeviceStatus.method into an enum (fabrice.bellamy@distrilab.fr)
+- refactoring fido/mod.rs (fabrice.bellamy@distrilab.fr)
+- refactoring fido/hid.rs (fabrice.bellamy@distrilab.fr)
+- feat(docs): add building from source docs to wiki (git@suyogtandel.in)
+- fix(nix): add udev to libraries in shell.nix (git@suyogtandel.in)
+- chore(nix): add mold linker to shell.nix to improve linking speeds and also
+  fix libcanberra errors (git@suyogtandel.in)
+- fix: refresh device status when min pin len or pin is changed for passkey
+  (git@suyogtandel.in)
+- chore(ci/cd): update nightly build workflow (git@suyogtandel.in)
+- chore(deps): add terser to minify the frontend code in final build
+  (git@suyogtandel.in)
+- chore(deps): update versions of all frontend dependencies to latest
+  (git@suyogtandel.in)
+- fix(ui): residential key card formatting in passkeysView (git@suyogtandel.in)
+- Improve troubleshooting documentation for issue #38
+  (38373466+Lab-8916100448256@users.noreply.github.com)
+- squash commits that implement #37 (pico-openpgp support). See branch pico-
+  openpgp for detailed commits. (12b@distrilab.fr)
+- Implement #38 (#39) (38373466+Lab-8916100448256@users.noreply.github.com)
+- docs(README.md): list the instructions separately for enabling and disabling
+  flakes (226018678+jetcookies@users.noreply.github.com)
+- docs(README.md): restore the instruction for nix-shell
+  (226018678+jetcookies@users.noreply.github.com)
+- better error message when trying to decrease min pin length
+  (fabrice.bellamy@distrilab.fr)
+- implement custom HidTransport to send set_min_pin_length command because
+  ctap-hid-fido2 set_min_pin_length has a bug (fabrice.bellamy@distrilab.fr)
+- fix minPinDialog submit button onclick handler (fabrice.bellamy@distrilab.fr)
+- Enable the feature to chnage min pin length when a pin is defined
+  (fabrice.bellamy@distrilab.fr)
+- add pico-keys new USB VID/PIDs (fabrice.bellamy@distrilab.fr)
+- docs(README.md): update the nix instructions to use flakes
+  (226018678+jetcookies@users.noreply.github.com)
+- build(flake.lock): nix flake update
+  (226018678+jetcookies@users.noreply.github.com)
+- build: add a basic flake.nix (226018678+jetcookies@users.noreply.github.com)
+- build(package.nix): 0.2.1 -> 0.3.0
+  (226018678+jetcookies@users.noreply.github.com)
+
 * Thu Jan 22 2026 Suyog Tandel <git@suyogtandel.in> 0.3.0-1
 - chore: sync spec to 0.3.0 [skip ci] (git@suyogtandel.in)
 - chore: bump app version to 0.3.0 (git@suyogtandel.in)
