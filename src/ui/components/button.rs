@@ -4,23 +4,24 @@ use crate::ui::colors;
 use gpui::prelude::*;
 use gpui::*;
 use gpui_component::{
-    Icon,
+    Disableable, Icon, Sizable, Size,
     button::{Button, ButtonCustomVariant, ButtonVariants},
     h_flex,
 };
 
-pub struct Clicked;
-
+/// A stateless text button wrapper
+#[derive(IntoElement)]
 pub struct PFButton {
     text: SharedString,
-    on_click: Option<Box<dyn Fn(&ClickEvent, &mut Window, &mut Context<Self>) + 'static>>,
-    hovered: bool,
-    hover_t: f32,
+    on_click: Option<Box<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>>,
     bg_color_start: Rgba,
     bg_color_hover: Rgba,
     bg_color_active: Rgba,
     width_full: bool,
     centered: bool,
+    disabled: bool,
+    small: bool,
+    loading: bool,
 }
 
 impl PFButton {
@@ -28,21 +29,30 @@ impl PFButton {
         Self {
             text: text.into(),
             on_click: None,
-            hovered: false,
-            hover_t: 0.0,
             bg_color_start: rgb(0x1b1b1d),
             bg_color_hover: rgb(0x232325),
             bg_color_active: rgb(colors::zinc::ZINC700),
             width_full: false,
             centered: false,
+            disabled: false,
+            small: false,
+            loading: false,
         }
     }
 
     pub fn on_click(
         mut self,
-        handler: impl Fn(&ClickEvent, &mut Window, &mut Context<Self>) + 'static,
+        handler: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
     ) -> Self {
         self.on_click = Some(Box::new(handler));
+        self
+    }
+
+    /// Allows overriding the default colors
+    pub fn with_colors(mut self, start: Rgba, hover: Rgba, active: Rgba) -> Self {
+        self.bg_color_start = start;
+        self.bg_color_hover = hover;
+        self.bg_color_active = active;
         self
     }
 
@@ -61,39 +71,49 @@ impl PFButton {
         self.centered = true;
         self
     }
+
+    pub fn disabled(mut self, disabled: bool) -> Self {
+        self.disabled = disabled;
+        self
+    }
+
+    pub fn small(mut self) -> Self {
+        self.small = true;
+        self
+    }
+
+    pub fn loading(mut self, loading: bool) -> Self {
+        self.loading = loading;
+        self
+    }
 }
 
-impl Render for PFButton {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let target_hover = if self.hovered { 1.0 } else { 0.0 };
-        if (self.hover_t - target_hover).abs() > 0.01 {
-            self.hover_t += (target_hover - self.hover_t) * 0.2;
-            window.request_animation_frame();
-        } else {
-            self.hover_t = target_hover;
-        }
-
-        let c1 = self.bg_color_start;
-        let c2 = self.bg_color_hover;
-        let t = self.hover_t;
-        let bg_color = Rgba {
-            r: c1.r + (c2.r - c1.r) * t,
-            g: c1.g + (c2.g - c1.g) * t,
-            b: c1.b + (c2.b - c1.b) * t,
-            a: 1.0,
-        };
-
-        let text = self.text.clone();
+// RenderOnce makes this a "Component" not an "Entity"
+impl RenderOnce for PFButton {
+    fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let text = self.text;
 
         let mut btn = Button::new("pf-btn").custom(
             ButtonCustomVariant::new(cx)
-                .color(bg_color.into())
-                .hover(bg_color.into())
+                .color(self.bg_color_start.into())
+                .hover(self.bg_color_hover.into())
                 .active(self.bg_color_active.into()),
         );
 
         if self.width_full {
             btn = btn.w_full();
+        }
+
+        if self.disabled {
+            btn = btn.disabled(true);
+        }
+
+        if self.loading {
+            btn = btn.loading(true);
+        }
+
+        if self.small {
+            btn = btn.with_size(Size::Small);
         }
 
         let content = if self.centered {
@@ -102,31 +122,28 @@ impl Render for PFButton {
             h_flex().child(text)
         };
 
-        let on_click = self.on_click.take();
-        if let Some(handler) = on_click {
-            btn = btn.on_click(cx.listener(move |_, event, window, cx| handler(event, window, cx)));
+        if let Some(handler) = self.on_click {
+            // We cast the handler to satisfy GPUI's generic requirements
+            btn = btn.on_click(move |e, w, c| handler(e, w, c));
         }
 
-        div()
-            .child(btn.child(content))
-            .id("pf-btn-wrapper")
-            .on_hover(cx.listener(|this, hovered, _, cx| {
-                if this.hovered != *hovered {
-                    this.hovered = *hovered;
-                    cx.notify();
-                }
-            }))
+        btn.child(content)
     }
 }
 
+/// A stateless Icon + Text button wrapper
+#[derive(IntoElement)]
 pub struct PFIconButton {
     icon: Icon,
     text: SharedString,
-    hovered: bool,
-    hover_t: f32,
+    on_click: Option<Box<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>>,
     bg_color_start: Rgba,
     bg_color_hover: Rgba,
     bg_color_active: Rgba,
+    disabled: bool,
+    small: bool,
+    width_full: bool,
+    loading: bool,
 }
 
 impl PFIconButton {
@@ -134,60 +151,85 @@ impl PFIconButton {
         Self {
             icon: icon.into(),
             text: text.into(),
-            hovered: false,
-            hover_t: 0.0,
+            on_click: None,
             bg_color_start: rgb(0x1b1b1d),
             bg_color_hover: rgb(0x232325),
             bg_color_active: rgb(colors::zinc::ZINC700),
+            disabled: false,
+            small: false,
+            width_full: false,
+            loading: false,
         }
+    }
+
+    pub fn on_click(
+        mut self,
+        handler: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        self.on_click = Some(Box::new(handler));
+        self
+    }
+
+    pub fn with_colors(mut self, start: Rgba, hover: Rgba, active: Rgba) -> Self {
+        self.bg_color_start = start;
+        self.bg_color_hover = hover;
+        self.bg_color_active = active;
+        self
+    }
+
+    pub fn disabled(mut self, disabled: bool) -> Self {
+        self.disabled = disabled;
+        self
+    }
+
+    pub fn small(mut self) -> Self {
+        self.small = true;
+        self
+    }
+
+    pub fn w_full(mut self) -> Self {
+        self.width_full = true;
+        self
+    }
+
+    pub fn loading(mut self, loading: bool) -> Self {
+        self.loading = loading;
+        self
     }
 }
 
-impl EventEmitter<Clicked> for PFIconButton {}
+impl RenderOnce for PFIconButton {
+    fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let text = self.text;
+        let icon = self.icon;
 
-impl Render for PFIconButton {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let target_hover = if self.hovered { 1.0 } else { 0.0 };
-        if (self.hover_t - target_hover).abs() > 0.01 {
-            self.hover_t += (target_hover - self.hover_t) * 0.2;
-            window.request_animation_frame();
-        } else {
-            self.hover_t = target_hover;
+        let mut btn = Button::new("pf-icon-btn").custom(
+            ButtonCustomVariant::new(cx)
+                .color(self.bg_color_start.into())
+                .hover(self.bg_color_hover.into())
+                .active(self.bg_color_active.into()),
+        );
+
+        if self.width_full {
+            btn = btn.w_full();
         }
 
-        let c1 = self.bg_color_start;
-        let c2 = self.bg_color_hover;
-        let t = self.hover_t;
-        let bg_color = Rgba {
-            r: c1.r + (c2.r - c1.r) * t,
-            g: c1.g + (c2.g - c1.g) * t,
-            b: c1.b + (c2.b - c1.b) * t,
-            a: 1.0,
-        };
+        if self.disabled {
+            btn = btn.disabled(true);
+        }
 
-        let text = self.text.clone();
-        let icon = self.icon.clone();
+        if self.loading {
+            btn = btn.loading(true);
+        }
 
-        let btn = Button::new("pf-icon-btn")
-            .custom(
-                ButtonCustomVariant::new(cx)
-                    .color(bg_color.into())
-                    .hover(bg_color.into())
-                    .active(self.bg_color_active.into()),
-            )
-            .w_full()
-            .on_click(cx.listener(|_, _, _, cx| {
-                cx.emit(Clicked);
-            }));
+        if self.small {
+            btn = btn.with_size(Size::Small);
+        }
 
-        div()
-            .child(btn.child(h_flex().gap_2().justify_center().child(icon).child(text)))
-            .id("pf-icon-btn-wrapper")
-            .on_hover(cx.listener(|this, hovered, _, cx| {
-                if this.hovered != *hovered {
-                    this.hovered = *hovered;
-                    cx.notify();
-                }
-            }))
+        if let Some(handler) = self.on_click {
+            btn = btn.on_click(move |e, w, c| handler(e, w, c));
+        }
+
+        btn.child(h_flex().gap_2().justify_center().child(icon).child(text))
     }
 }

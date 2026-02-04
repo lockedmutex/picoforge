@@ -1,6 +1,6 @@
 use crate::device::io;
 use crate::device::types::{FidoDeviceInfo, FullDeviceStatus, StoredCredential};
-use crate::ui::components::{card::Card, page_view::PageView};
+use crate::ui::components::{card::Card, page_view::PageView, button::{PFButton, PFIconButton}};
 use gpui::*;
 use gpui_component::button::{Button, ButtonVariants};
 use gpui_component::{
@@ -275,9 +275,7 @@ impl PasskeysView {
                     ),
             )
             .child(
-                Button::new("change-pin-btn")
-                    .outline()
-                    .child(if pin_set { "Change PIN" } else { "Set PIN" })
+                PFButton::new(if pin_set { "Change PIN" } else { "Set PIN" })
                     .on_click(listener),
             )
     }
@@ -315,10 +313,8 @@ impl PasskeysView {
                     ),
             )
             .child(
-                Button::new("update-pin-len-btn")
-                    .outline()
-                    .disabled(!pin_set)
-                    .child("Update Minimum Length"),
+                PFButton::new("Update Minimum Length")
+                    .disabled(!pin_set),
             )
     }
 
@@ -369,14 +365,11 @@ impl PasskeysView {
                             ),
                     )
                     .child(
-                        Button::new("unlock-btn")
-                            .child(
-                                h_flex()
-                                    .gap_2()
-                                    .child(Icon::default().path("icons/lock-open.svg"))
-                                    .child("Unlock Storage"),
-                            )
-                            .on_click(listener),
+                        PFIconButton::new(
+                            Icon::default().path("icons/lock-open.svg"),
+                            "Unlock Storage",
+                        )
+                        .on_click(listener),
                     ),
             )
     }
@@ -444,16 +437,12 @@ impl PasskeysView {
                                     ),
                             )
                             .child(
-                                Button::new("lock-storage-btn")
-                                    .outline()
-                                    .small()
-                                    .child(
-                                        h_flex()
-                                            .gap_2()
-                                            .child(Icon::default().path("icons/lock.svg").size_3p5())
-                                            .child("Lock Storage"),
-                                    )
-                                    .on_click(lock_listener),
+                                PFIconButton::new(
+                                    Icon::default().path("icons/lock.svg").size_3p5(),
+                                    "Lock Storage",
+                                )
+                                .small()
+                                .on_click(lock_listener),
                             ),
                     )
                     .child(if self.credentials.is_empty() {
@@ -517,17 +506,15 @@ impl PasskeysView {
                                 .gap_2()
                                 .justify_end()
                                 .child(
-                                    Button::new("cancel-unlock")
-                                        .label("Cancel")
+                                    PFButton::new("Cancel")
                                         .on_click(cx.listener(|this, _, _, cx| {
                                             this.active_modal = None;
                                             cx.notify();
                                         }))
                                 )
                                 .child(
-                                    Button::new("confirm-unlock")
-                                        .primary()
-                                        .label("Unlock")
+                                    PFButton::new("Unlock")
+                                        // Primary/Zinc style is default
                                         .on_click(cx.listener(move |this, _, _, cx| {
                                             let pin = pin_input_clone.read(cx).text().to_string();
                                             if !pin.is_empty() {
@@ -552,17 +539,15 @@ impl PasskeysView {
                                 .gap_2()
                                 .justify_end()
                                 .child(
-                                    Button::new("cancel-del")
-                                        .label("Cancel")
+                                    PFButton::new("Cancel")
                                         .on_click(cx.listener(|this, _, _, cx| {
                                             this.active_modal = None;
                                             cx.notify();
                                         }))
                                 )
                                 .child(
-                                    Button::new("confirm-del")
-                                        .danger()
-                                        .label("Delete")
+                                    PFButton::new("Delete")
+                                        .with_colors(rgb(0x7f1d1d), rgb(0x991b1b), rgb(0xfca5a5)) // Danger colors
                                         .on_click(cx.listener(move |this, _, _, cx| {
                                             this.execute_delete(cred_id.clone(), pin_str.clone(), cx);
                                             this.active_modal = None;

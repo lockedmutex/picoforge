@@ -1,5 +1,4 @@
 use crate::device::io;
-use crate::ui::components::button::PFIconButton;
 use crate::ui::components::sidebar::AppSidebar;
 use crate::ui::ui_types::{ActiveView, GlobalDeviceState};
 use crate::ui::{
@@ -13,7 +12,7 @@ use crate::ui::{
 use gpui::prelude::*;
 use gpui::*;
 use gpui_component::{
-    ActiveTheme, Icon, IconName, TitleBar, WindowExt,
+    ActiveTheme, IconName, TitleBar, WindowExt,
     button::{Button, ButtonVariants},
     h_flex,
     scroll::ScrollableElement,
@@ -26,23 +25,13 @@ pub struct ApplicationRoot {
     state: GlobalDeviceState,
     device_loading: bool,
     sidebar_width: Pixels,
-    refresh_button: Entity<PFIconButton>,
     config_view: Option<Entity<ConfigView>>,
     passkeys_view: Option<Entity<PasskeysView>>,
 }
 
 impl ApplicationRoot {
     pub fn new(cx: &mut Context<Self>) -> Self {
-        let refresh_button = cx
-            .new(|_cx| PFIconButton::new(Icon::default().path("icons/refresh-cw.svg"), "Refresh"));
-
-        cx.subscribe(
-            &refresh_button,
-            |this, _, _: &crate::ui::components::button::Clicked, cx| {
-                this.refresh_device_status(cx);
-            },
-        )
-        .detach();
+        // We no longer need to create a persistent PFIconButton entity here
 
         let mut this = Self {
             active_view: ActiveView::Home,
@@ -50,7 +39,6 @@ impl ApplicationRoot {
             state: GlobalDeviceState::new(),
             device_loading: false,
             sidebar_width: px(255.),
-            refresh_button,
             config_view: None,
             passkeys_view: None,
         };
@@ -129,15 +117,10 @@ impl Render for ApplicationRoot {
                     .on_select(|this: &mut Self, view, _, _| {
                         this.active_view = view;
                     })
-                    .with_refresh_btn(self.refresh_button.clone())
-                    .with_refresh_btn_collapsed(
-                        Button::new("refresh-btn-collapsed")
-                            .ghost()
-                            .child(Icon::default().path("icons/refresh-cw.svg"))
-                            .on_click(cx.listener(|this, _, _, cx| {
-                                this.refresh_device_status(cx);
-                            })),
-                    )
+                    // Here is the new connection: passing the refresh logic to the sidebar
+                    .on_refresh(|this, _, cx| {
+                        this.refresh_device_status(cx);
+                    })
                     .render(cx),
                 )
                 .child(

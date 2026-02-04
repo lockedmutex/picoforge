@@ -1,8 +1,15 @@
 use crate::device::types::DeviceMethod;
 use crate::ui::colors;
+use crate::ui::components::button::PFIconButton;
 use crate::ui::ui_types::{ActiveView, GlobalDeviceState};
 use gpui::*;
-use gpui_component::{ActiveTheme, Icon, IconName, Side, h_flex, sidebar::*, v_flex};
+use gpui_component::{
+    ActiveTheme, Icon, IconName, Side,
+    button::{Button, ButtonVariants},
+    h_flex,
+    sidebar::*,
+    v_flex,
+};
 use std::rc::Rc;
 
 pub struct AppSidebar<V: 'static> {
@@ -11,8 +18,7 @@ pub struct AppSidebar<V: 'static> {
     collapsed: bool,
     state: GlobalDeviceState,
     on_select: Option<Rc<dyn Fn(&mut V, ActiveView, &mut Window, &mut Context<V>)>>,
-    refresh_btn: Option<AnyElement>,
-    refresh_btn_collapsed: Option<AnyElement>,
+    on_refresh: Option<Rc<dyn Fn(&mut V, &mut Window, &mut Context<V>)>>,
 }
 
 impl<V: 'static> AppSidebar<V> {
@@ -28,8 +34,7 @@ impl<V: 'static> AppSidebar<V> {
             collapsed,
             state,
             on_select: None,
-            refresh_btn: None,
-            refresh_btn_collapsed: None,
+            on_refresh: None,
         }
     }
 
@@ -41,13 +46,11 @@ impl<V: 'static> AppSidebar<V> {
         self
     }
 
-    pub fn with_refresh_btn(mut self, btn: impl IntoElement) -> Self {
-        self.refresh_btn = Some(btn.into_any_element());
-        self
-    }
-
-    pub fn with_refresh_btn_collapsed(mut self, btn: impl IntoElement) -> Self {
-        self.refresh_btn_collapsed = Some(btn.into_any_element());
+    pub fn on_refresh(
+        mut self,
+        handler: impl Fn(&mut V, &mut Window, &mut Context<V>) + 'static,
+    ) -> Self {
+        self.on_refresh = Some(Rc::new(handler));
         self
     }
 
@@ -58,6 +61,10 @@ impl<V: 'static> AppSidebar<V> {
 
         let border_color = cx.theme().sidebar_border;
         let muted_foreground = cx.theme().muted_foreground;
+
+        // Clone for closures
+        let on_refresh = self.on_refresh.clone();
+        let on_refresh_collapsed = self.on_refresh.clone();
 
         v_flex()
             .h_full()
@@ -176,7 +183,17 @@ impl<V: 'static> AppSidebar<V> {
                             .items_center()
                             .justify_center()
                             .gap_2()
-                            .children(self.refresh_btn_collapsed)
+                            .child(
+                                Button::new("refresh-btn-collapsed")
+                                    .ghost()
+                                    .child(Icon::default().path("icons/refresh-cw.svg"))
+                                    .on_click(cx.listener(move |this, _, window, cx| {
+                                        if let Some(f) = &on_refresh_collapsed {
+                                            f(this, window, cx);
+                                        }
+                                    }))
+                                    .w_full(),
+                            )
                             .child(div().w(px(8.)).h(px(8.)).rounded_full().bg(
                                 if let Some(status) = &state.device_status {
                                     if status.method == DeviceMethod::Fido {
@@ -235,7 +252,19 @@ impl<V: 'static> AppSidebar<V> {
                                             )
                                     }),
                             )
-                            .children(self.refresh_btn)
+                            .child(
+                                PFIconButton::new(
+                                    Icon::default().path("icons/refresh-cw.svg"),
+                                    "Refresh",
+                                )
+                                .on_click(cx.listener(
+                                    move |this, _, window, cx| {
+                                        if let Some(f) = &on_refresh {
+                                            f(this, window, cx);
+                                        }
+                                    },
+                                )),
+                            )
                     }),
             )
     }
