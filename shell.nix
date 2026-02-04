@@ -1,4 +1,6 @@
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 
 let
   libraries = with pkgs; [
@@ -31,10 +33,12 @@ let
 
     # Development tools
     rustc
+    clippy
+    rustfmt
+    rust-analyzer
+    rustPlatform.rustLibSrc
     mold
     cargo
-    deno
-    nodejs_22
 
     # GPUI
     libxkbcommon
@@ -48,9 +52,10 @@ in
 pkgs.mkShell {
   buildInputs = packages;
 
+  RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
+
   shellHook = ''
     export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath libraries}:$LD_LIBRARY_PATH
-    # export GTK_PATH=${pkgs.libcanberra-gtk3}/lib/gtk-3.0:${pkgs.packagekit}/lib/gtk-3.0:$GTK_PATH
     export XDG_DATA_DIRS=$GSETTINGS_SCHEMAS_PATH:$XDG_DATA_DIRS
     export RUSTFLAGS="-C link-arg=-fuse-ld=mold"
 
@@ -59,6 +64,6 @@ pkgs.mkShell {
     # export WEBKIT_DISABLE_COMPOSITING_MODE=1
 
     echo "Nix development environment loaded!"
-    echo "Available tools: rustc, cargo, deno, node, tauri"
+    echo "Available tools: rustc, cargo"
   '';
 }

@@ -6,13 +6,14 @@ use crate::ui::{
     colors,
     views::{
         about::AboutView, config::ConfigView, home::HomeView, logs::LogsView,
-        passkeys::PasskeysView, security::SecurityView,
+        passkeys::PasskeysEvent, passkeys::PasskeysView, security::SecurityView,
     },
 };
+
 use gpui::prelude::*;
 use gpui::*;
 use gpui_component::{
-    ActiveTheme, Icon, IconName, TitleBar,
+    ActiveTheme, Icon, IconName, TitleBar, WindowExt,
     button::{Button, ButtonVariants},
     h_flex,
     scroll::ScrollableElement,
@@ -27,6 +28,7 @@ pub struct ApplicationRoot {
     sidebar_width: Pixels,
     refresh_button: Entity<PFIconButton>,
     config_view: Option<Entity<ConfigView>>,
+    passkeys_view: Option<Entity<PasskeysView>>,
 }
 
 impl ApplicationRoot {
@@ -50,6 +52,7 @@ impl ApplicationRoot {
             sidebar_width: px(255.),
             refresh_button,
             config_view: None,
+            passkeys_view: None,
         };
         this.refresh_device_status(cx);
         this
@@ -81,7 +84,14 @@ impl ApplicationRoot {
 
                 if let Some(config_view) = &self.config_view {
                     config_view.update(cx, |view, cx| {
-                        view.update_device_status(Some(status), cx);
+                        view.update_device_status(Some(status.clone()), cx);
+                    });
+                }
+
+                if let Some(passkeys_view) = &self.passkeys_view {
+                    let fido = self.state.fido_info.clone();
+                    passkeys_view.update(cx, |view, cx| {
+                        view.update_device_status(Some(status.clone()), fido, cx);
                     });
                 }
             }
@@ -164,7 +174,36 @@ impl Render for ApplicationRoot {
                                         HomeView::build(&self.state, cx.theme()).into_any_element()
                                     }
                                     ActiveView::Passkeys => {
-                                        PasskeysView::build(cx.theme()).into_any_element()
+                                        let view = self.passkeys_view.get_or_insert_with(|| {
+                                            let view = cx.new(|cx| {
+                                                PasskeysView::new(
+                                                    window,
+                                                    cx,
+                                                    self.state.device_status.clone(),
+                                                    self.state.fido_info.clone(),
+                                                )
+                                            });
+                                            cx.subscribe_in(
+                                                &view,
+                                                window,
+                                                |_, _, event: &PasskeysEvent, window, cx| {
+                                                    match event {
+                                                        PasskeysEvent::Notification(msg) => {
+                                                            window.push_notification(
+                                                                msg.to_string(),
+                                                                cx,
+                                                            );
+                                                        }
+                                                        PasskeysEvent::CloseDialog => {
+                                                            window.close_dialog(cx);
+                                                        }
+                                                    }
+                                                },
+                                            )
+                                            .detach();
+                                            view
+                                        });
+                                        view.clone().into_any_element()
                                     }
                                     ActiveView::Configuration => {
                                         let view = self.config_view.get_or_insert_with(|| {
