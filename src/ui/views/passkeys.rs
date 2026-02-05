@@ -722,13 +722,13 @@ impl PasskeysView {
                 v_flex()
                     .items_center()
                     .justify_center()
-                    .gap_4()
-                    .py_8()
+                    .gap_3()
+                    .py_3()
                     .child(
                         div().rounded_full().bg(theme.muted).p_4().child(
                             Icon::default()
                                 .path("icons/shield.svg")
-                                .size_8()
+                                .size_12()
                                 .text_color(theme.muted_foreground),
                         ),
                     )
@@ -749,7 +749,9 @@ impl PasskeysView {
                             Icon::default().path("icons/lock-open.svg"),
                             "Unlock Storage",
                         )
-                        .on_click(listener),
+                        .on_click(listener)
+                        .with_colors(rgb(0xe4e4e7), rgb(0xd0d0d3), rgb(0xe4e4e7))
+                        .with_text_color(rgb(0x18181b)),
                     ),
             )
     }

@@ -24,6 +24,7 @@ pub struct PFButton {
     disabled: bool,
     small: bool,
     loading: bool,
+    text_color: Option<Rgba>,
 }
 
 impl PFButton {
@@ -41,6 +42,7 @@ impl PFButton {
             disabled: false,
             small: false,
             loading: false,
+            text_color: None,
         }
     }
 
@@ -62,6 +64,11 @@ impl PFButton {
         self.bg_color_start = start;
         self.bg_color_hover = hover;
         self.bg_color_active = active;
+        self
+    }
+
+    pub fn with_text_color(mut self, color: Rgba) -> Self {
+        self.text_color = Some(color);
         self
     }
 
@@ -133,6 +140,12 @@ impl RenderOnce for PFButton {
             h_flex().child(text)
         };
 
+        let content = if let Some(color) = self.text_color {
+            content.text_color(color)
+        } else {
+            content
+        };
+
         if let Some(handler) = self.on_click {
             btn = btn.on_click(move |e, w, c| handler(e, w, c));
         }
@@ -154,6 +167,7 @@ pub struct PFIconButton {
     small: bool,
     width_full: bool,
     loading: bool,
+    text_color: Option<Rgba>,
 }
 
 impl PFIconButton {
@@ -169,6 +183,7 @@ impl PFIconButton {
             small: false,
             width_full: false,
             loading: false,
+            text_color: None,
         }
     }
 
@@ -184,6 +199,11 @@ impl PFIconButton {
         self.bg_color_start = start;
         self.bg_color_hover = hover;
         self.bg_color_active = active;
+        self
+    }
+
+    pub fn with_text_color(mut self, color: Rgba) -> Self {
+        self.text_color = Some(color);
         self
     }
 
@@ -243,6 +263,13 @@ impl RenderOnce for PFIconButton {
             btn = btn.on_click(move |e, w, c| handler(e, w, c));
         }
 
-        btn.child(h_flex().gap_2().justify_center().child(icon).child(text))
+        let content = h_flex().gap_2().justify_center().child(icon).child(text);
+        let content = if let Some(color) = self.text_color {
+            content.text_color(color)
+        } else {
+            content
+        };
+
+        btn.child(content)
     }
 }
