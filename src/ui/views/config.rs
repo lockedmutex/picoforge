@@ -309,12 +309,6 @@ impl ConfigView {
         let method = status.method.clone();
 
         self._task = Some(cx.spawn(async move |_, cx| {
-            use std::time::Duration;
-
-            cx.background_executor()
-                .timer(Duration::from_millis(500))
-                .await;
-
             let result = io::write_config(changes, method, None);
 
             let _ = entity.update(cx, |this, cx| {

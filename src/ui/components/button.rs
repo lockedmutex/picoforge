@@ -1,10 +1,11 @@
 #![allow(unused)]
 
 use crate::ui::colors;
+use gpui::Styled;
 use gpui::prelude::*;
 use gpui::*;
 use gpui_component::{
-    Disableable, Icon, Sizable, Size,
+    ActiveTheme, Disableable, Icon, Sizable, Size,
     button::{Button, ButtonCustomVariant, ButtonVariants},
     h_flex,
 };
@@ -100,12 +101,15 @@ impl RenderOnce for PFButton {
     fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
         let text = self.text;
 
-        let mut btn = Button::new(self.id).custom(
-            ButtonCustomVariant::new(cx)
-                .color(self.bg_color_start.into())
-                .hover(self.bg_color_hover.into())
-                .active(self.bg_color_active.into()),
-        );
+        let mut btn = Button::new(self.id)
+            .custom(
+                ButtonCustomVariant::new(cx)
+                    .color(self.bg_color_start.into())
+                    .hover(self.bg_color_hover.into())
+                    .active(self.bg_color_active.into())
+                    .border(cx.theme().border),
+            )
+            .border_t_1();
 
         if self.width_full {
             btn = btn.w_full();
@@ -209,12 +213,15 @@ impl RenderOnce for PFIconButton {
         let text = self.text;
         let icon = self.icon;
 
-        let mut btn = Button::new("pf-icon-btn").custom(
-            ButtonCustomVariant::new(cx)
-                .color(self.bg_color_start.into())
-                .hover(self.bg_color_hover.into())
-                .active(self.bg_color_active.into()),
-        );
+        let mut btn = Button::new("pf-icon-btn")
+            .custom(
+                ButtonCustomVariant::new(cx)
+                    .color(self.bg_color_start.into())
+                    .hover(self.bg_color_hover.into())
+                    .active(self.bg_color_active.into())
+                    .border(cx.theme().border),
+            )
+            .border_t_1();
 
         if self.width_full {
             btn = btn.w_full();
