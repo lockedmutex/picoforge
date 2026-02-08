@@ -627,7 +627,7 @@ impl ConfigView {
 }
 
 impl Render for ConfigView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = cx.theme();
         if self.device_status.is_none() {
             return PageView::build(
@@ -655,6 +655,9 @@ impl Render for ConfigView {
         let identity_card = self.render_identity_card(theme).into_any_element();
         let touch_card = self.render_touch_card(theme).into_any_element();
 
+        let is_wide = window.bounds().size.width > px(1100.0);
+        let columns = if is_wide { 2 } else { 1 };
+
         PageView::build(
             "Configuration",
             "Customize device settings and behavior.",
@@ -663,7 +666,7 @@ impl Render for ConfigView {
                 .child(
                     div()
                         .grid()
-                        .grid_cols(2)
+                        .grid_cols(columns)
                         .gap_6()
                         .child(identity_card)
                         .child(led_card)

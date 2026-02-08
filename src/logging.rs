@@ -127,6 +127,7 @@ pub fn logger_init() {
         .logger(
             Logger::builder()
                 .appenders(["stdout", "logfile", "buffer"])
+                .additive(false)
                 .build("picoforge", app_level),
         )
         .logger(Logger::builder().build("gpui", LevelFilter::Error))

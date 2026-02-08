@@ -155,9 +155,12 @@ impl Render for ApplicationRoot {
                                 .flex_grow()
                                 .bg(cx.theme().background)
                                 .child(match self.active_view {
-                                    ActiveView::Home => {
-                                        HomeView::build(&self.state, cx.theme()).into_any_element()
-                                    }
+                                    ActiveView::Home => HomeView::build(
+                                        &self.state,
+                                        cx.theme(),
+                                        window.bounds().size.width,
+                                    )
+                                    .into_any_element(),
                                     ActiveView::Passkeys => {
                                         let view = self.passkeys_view.get_or_insert_with(|| {
                                             let view = cx.new(|cx| {

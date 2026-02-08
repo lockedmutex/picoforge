@@ -889,6 +889,8 @@ impl PasskeysView {
                         h_flex()
                             .gap_3()
                             .items_center()
+                            .flex_1()
+                            .min_w_0()
                             .child(
                                 div()
                                     .size_10()
@@ -906,11 +908,29 @@ impl PasskeysView {
                             )
                             .child(
                                 v_flex()
-                                    .child(div().font_semibold().child(cred.rp_name.clone()))
+                                    .min_w_0()
+                                    .overflow_hidden()
+                                    .child(
+                                        div()
+                                            .font_semibold()
+                                            .whitespace_nowrap()
+                                            .overflow_hidden()
+                                            .text_ellipsis()
+                                            .child(if !cred.rp_name.is_empty() {
+                                                cred.rp_name.clone()
+                                            } else if !cred.rp_id.is_empty() {
+                                                cred.rp_id.clone()
+                                            } else {
+                                                "Unknown Service".to_string()
+                                            }),
+                                    )
                                     .child(
                                         div()
                                             .text_sm()
                                             .text_color(theme.muted_foreground)
+                                            .whitespace_nowrap()
+                                            .overflow_hidden()
+                                            .text_ellipsis()
                                             .child(cred.user_name.clone()),
                                     ),
                             ),

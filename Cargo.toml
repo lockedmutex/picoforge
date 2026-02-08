@@ -43,6 +43,3 @@ lto = true        # Enables link-time-optimizations however is not stable.
 opt-level = 3     # Prioritizes speed. Use `z` if you prefer small binary size.
 panic = "abort"   # Higher performance by disabling panic handlers.
 strip = true      # Ensures debug symbols are removed.
-
-[alias]
-run-watch = "watch -c -x check -x run"

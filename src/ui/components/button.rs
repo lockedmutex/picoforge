@@ -241,7 +241,7 @@ impl RenderOnce for PFIconButton {
                     .active(self.bg_color_active.into())
                     .border(cx.theme().border),
             )
-            .border_t_1();
+            .border_t_2();
 
         if self.width_full {
             btn = btn.w_full();

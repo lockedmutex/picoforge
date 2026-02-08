@@ -8,8 +8,14 @@ use gpui_component::{Icon, IconName, Theme, badge::Badge, h_flex, progress::Prog
 pub struct HomeView;
 
 impl HomeView {
-    pub fn build(state: &GlobalDeviceState, theme: &Theme) -> impl IntoElement {
+    pub fn build(
+        state: &GlobalDeviceState,
+        theme: &Theme,
+        window_width: Pixels,
+    ) -> impl IntoElement {
         let connected = state.device_status.is_some();
+        let is_wide = window_width > px(1100.0);
+        let columns = if is_wide { 2 } else { 1 };
 
         PageView::build(
             "Device Overview",
@@ -31,10 +37,10 @@ impl HomeView {
                     )
                     .into_any_element()
             } else {
-                // 4 Card Grid
+                // Card Grid
                 div()
                     .grid()
-                    .grid_cols(2)
+                    .grid_cols(columns)
                     .gap_6()
                     .child(Self::render_device_info(state, theme))
                     .child(Self::render_fido_info(state, theme))
@@ -107,7 +113,7 @@ impl HomeView {
                             ))
                             .child(Self::render_kv(
                                 "VID:PID",
-                                format!("{}, {}", config.vid, config.pid),
+                                format!("{}:{}", config.vid, config.pid),
                                 theme,
                                 true,
                             ))

@@ -71,13 +71,6 @@ impl Render for LogsView {
                 .gap_4()
                 .h_full()
                 .child(
-                    h_flex().justify_end().child(
-                        Button::new("clear_logs")
-                            .label("Clear Logs")
-                            .on_click(clear_listener),
-                    ),
-                )
-                .child(
                     div()
                         .flex_1()
                         .flex()
@@ -111,7 +104,6 @@ impl Render for LogsView {
                                 .h(px(500.0))
                                 .child(div().p_4().font_family("Mono").text_sm().child(
                                     v_flex().gap_1().children(self.logs.iter().map(|log| {
-                                        // Simple heuristic for color
                                         let color = if log.contains("ERROR") {
                                             gpui::red()
                                         } else if log.contains("WARN") {
@@ -125,6 +117,13 @@ impl Render for LogsView {
                                 ))
                                 .into_any_element()
                         }),
+                )
+                .child(
+                    h_flex().justify_end().child(
+                        Button::new("clear_logs")
+                            .label("Clear Logs")
+                            .on_click(clear_listener),
+                    ),
                 ),
             theme,
         )
