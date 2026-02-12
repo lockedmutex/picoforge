@@ -22,7 +22,7 @@
 
 ## About
 
-PicoForge is a modern desktop application for configuring and managing Pico FIDO security keys. Built with Rust, Tauri, and Svelte, it provides an intuitive interface for:
+PicoForge is a modern desktop application for configuring and managing Pico FIDO security keys. Built with Rust and GPUI, it provides an intuitive interface for:
 
 - Reading device information and firmware details
 - Configuring USB VID/PID and product names
@@ -55,7 +55,7 @@ PicoForge is a modern desktop application for configuring and managing Pico FIDO
 - **Device Configuration** - Customize USB identifiers, LED behavior, and hardware settings
 - **Security Management** - Enable secure boot and firmware verification (experimental and WIP)
 - **Real-time Monitoring** - View flash usage, connection status, and system logs
-- **Modern UI** - Clean, responsive interface built with Svelte and shadcn-svelte
+- **Modern UI** - Clean, responsive interface built with Rust and GPUI
 - **Multi-Vendor Support** - Compatible with multiple hardware variants
 - **Cross-Platform** - Works on Windows, macOS, and Linux
 
@@ -82,8 +82,6 @@ Check the official [PicoForge Wiki](https://github.com/librekeys/picoforge/wiki/
 
 To contribute to PicoForge, you'll need:
 
-- **[Node.js](https://nodejs.org/)** - JavaScript/TypeScript runtime
-- **[Deno](https://deno.land/)** - JavaScript/TypeScript runtime
 - **[Rust](https://www.rust-lang.org/)** - System programming language (1.80+)
 - **PC/SC Middleware**:
   - Linux: `pcscd` (usually pre-installed)
@@ -99,50 +97,21 @@ git clone https://github.com/librekeys/picoforge.git
 cd picoforge
 ```
 
-### 2. Install Dependencies
+### 2. Build and Run
 
-#### Using Deno (Recommended)
-
-```bash
-deno install
-```
-
-#### Using npm
+To run the application in development mode:
 
 ```bash
-npm install
+cargo run
 ```
 
-### 3. Build the Application
+To build for production:
 
-#### Development Build
-
-**With Deno:**
 ```bash
-deno task tauri dev
+cargo build --release
 ```
 
-**With npm:**
-```bash
-npm run tauri dev
-```
-
-#### Production Build
-
-**With Deno:**
-```bash
-deno task tauri build
-```
-
-**With npm:**
-```bash
-npm run tauri build
-```
-
-The compiled binaries will be available in:
-- **Linux**: `src-tauri/target/release/bundle/`
-- **macOS**: `src-tauri/target/release/bundle/dmg/`
-- **Windows**: `src-tauri/target/release/bundle/`
+The compiled binary will be available in `target/release/picoforge` (Linux/macOS) or `target/release/picoforge.exe` (Windows).
 
 ## Building and Development with Nix
 
@@ -210,74 +179,52 @@ nix-shell
 Then you can build from source and run the application with:
 
 ```bash
-deno task tauri dev
+cargo run
 ```
 
 ## Project Structure
 
 ```
 picoforge/
-├── src/                      # Svelte frontend
-│   ├── lib/                  # Reusable components & utilities
-│   │   ├── components/       # UI components
-│   │   ├── device/           # Device-related logic
-│   │   ├── hooks/            # Custom Svelte hooks
-│   │   ├── layout/           # Layout components
-│   │   ├── services/         # Service layer
-│   │   ├── state/            # State management
-│   │   ├── utils.ts          # Utility functions
-│   │   └── views/            # View components
-│   ├── routes/               # SvelteKit pages
-│   │   ├── +layout.svelte    # Root layout
-│   │   ├── +layout.ts        # Layout configuration
-│   │   └── +page.svelte      # Home page
-│   ├── app.css               # Global styles
-│   └── app.html              # HTML template
-├── src-tauri/                # Rust backend
-│   ├── src/                  # Rust source code
-│   │   ├── fido/             # FIDO device logic
-│   │   ├── rescue/           # Rescue mode functionality
-│   │   ├── error.rs          # Error handling
-│   │   ├── io.rs             # I/O operations
-│   │   ├── lib.rs            # Tauri commands & PC/SC logic
-│   │   ├── logging.rs        # Logging utilities
-│   │   ├── main.rs           # Entry point
-│   │   └── types.rs          # Type definitions
-│   ├── icons/                # Application icons
-│   ├── capabilities/         # Tauri permissions
-│   │   └── default.json      # Default capabilities
-│   ├── Cargo.toml            # Rust dependencies
-│   ├── Cargo.lock            # Rust lock file
-│   ├── tauri.conf.json       # Tauri configuration
-│   ├── build.rs              # Build script
-│   └── rustfmt.toml          # Rust formatting config
-├── static/                   # Static assets
-│   ├── build-configure-symbolic.svg
-│   ├── favicon.png
-│   ├── in.suyogtandel.picoforge.svg
-│   ├── svelte.svg
-│   ├── tauri.svg
-│   └── vite.svg
+├── Cargo.toml                # Rust dependencies and project metadata
+├── Cargo.lock                # Rust dependency lock file
+├── src/                      # Source code
+│   ├── main.rs               # Application entry point
+│   ├── logging.rs            # Logging infrastructure
+│   ├── device/               # Device communication logic
+│   │   ├── fido/             # FIDO implementation
+│   │   ├── rescue/           # Rescue mode handling
+│   │   ├── io.rs             # IO Utilities
+│   │   ├── error.rs          # Device error types
+│   │   ├── mod.rs
+│   │   └── types.rs          # Device data types
+│   └── ui/                   # GPUI Frontend
+│       ├── components/       # Reusable UI components
+│       ├── views/            # View definitions
+│       ├── assets.rs         # Asset loader
+│       ├── colors.rs         # Color definitions
+│       ├── rootview.rs       # Root view container
+│       ├── ui_types.rs       # UI-specific types
+│       └── mod.rs
 ├── data/                     # Application data
 │   ├── in.suyogtandel.picoforge.desktop
 │   └── screenshots/          # Screenshots
-├── node_modules/             # Deno node compatibility modules
-├── components.json           # shadcn-svelte config
-├── package.json              # Node package manifest
-├── package-lock.json         # npm lock file
-├── deno.json                 # Deno configuration
-├── deno.lock                 # Deno lock file
-├── svelte.config.js          # SvelteKit configuration
-├── vite.config.js            # Vite bundler config
-├── tsconfig.json             # TypeScript configuration
-├── biome.json                # Biome configuration
+├── docs/                     # Documentation
+├── static/                   # Static assets (icons)
+├── flake.nix                 # Nix flake configuration
+├── default.nix               # Nix development shell
+├── shell.nix                 # Nix development shell
+├── picoforge.spec            # RPM Spec file
+├── package.nix               # Nix package definition
+├── ci.nix                    # CI configuration for cachix
+├── rustfmt.toml              # Rust formatting configuration
 ├── CREDITS.md                # Credits
-└── LICENSE                   # AGPL-3.0 license
+└── LICENSE                   # License
 ```
 
 ## Contributing
 
-Contributions are welcome (REALLY NEEDED, PLEASE HELP ME)! Please follow these steps:
+Contributions are welcome (REALLY NEEDED, PLEASE HELP ME)! follow these steps:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -287,8 +234,8 @@ Contributions are welcome (REALLY NEEDED, PLEASE HELP ME)! Please follow these s
 
 ### Development Guidelines
 
-- Follow Rust and TypeScript best practices
-- Use `deno fmt` to format the frontend code
+- Follow Rust best practices
+- Use `cargo fmt` to format the code
 - Write clear commit messages
 - Update documentation for new features
 - Test on multiple platforms when possible
@@ -299,13 +246,19 @@ This project is licensed under the **GNU Affero General Public License v3.0 (AGP
 
 See [LICENSE](LICENSE) for full details.
 
-## Maintainers
+## Repository Maintainers
 
 - **Suyog Tandel** ([@lockedmutex](https://github.com/lockedmutex))
 
+## Package Maintainers
+
+- **JetCookies** ([@jetcookies](https://github.com/jetcookies)): Maintainer of the [Nix](https://nixos.org/) package.
+- **Suyog Tandel** ([@lockedmutex](https://github.com/lockedmutex)): Maintainer of the [RPM](https://rpm.org/) package and Fedora Copr repository.
+
 ## Support
 
-- **Discord**: [Join our Discord server](https://discord.gg/6wYBpSHJY2) for community support and interaction
+- **Matrix**: [Join our Matrix room](https://matrix.to/#/%23librekeys:matrix.org)
+- **Discord**: [Join our Discord server](https://discord.gg/6wYBpSHJY2)
 - **Issues**: [GitHub Issues](https://github.com/librekeys/picoforge/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/librekeys/picoforge/discussions)
 

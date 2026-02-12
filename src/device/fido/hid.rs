@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::RngExt;
 use serde_cbor_2::{Value, to_vec};
 use std::collections::BTreeMap;
 use std::time::Duration;
