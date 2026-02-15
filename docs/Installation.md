@@ -32,6 +32,39 @@ Welcome to the official installation guide for PicoForge. This document will hel
 
 - Download the application from the [Latest Releases](https://github.com/librekeys/picoforge/releases/latest).
 - No additional driver setup is usually required as the PC/SC framework is built into macOS.
+  
+> [!IMPORTANT]
+> Note on Security: Picoforge images are currently unsigned. You will need to manually authorize the application to run.
+
+1. Download the App: Get the latest version from the Releases Page.
+
+  + Apple Silicon (M1/M2/M3): Download the arm64 version for native performance.
+  + Intel Macs: Download the x64 version.
+
+2. Authorization (Apple Silicon): Since the app is unsigned, choose one of the following methods to get it running on Apple Silicon:
+
+#### Option A: The "Rosetta" Path (Easiest)
+
+If you prefer a GUI approach, you can run the Intel version via translation.
+
++ Download the x64 image (e.g., picoforge_0.3.1_x64.dmg).
++ Open the file. If prompted, agree to install Rosetta.
++ Go to System Settings > Privacy & Security.
++ Scroll down to the Security section and click "Open Anyway" for Picoforge.
+
+#### Option B: The "Terminal" Path (Recommended for Performance)
+
+Use this to run the native arm64 version by stripping the "quarantine" flag.
+
++ Download and extract the arm64 zip file to find picoforge.app.
++ Open your Terminal and navigate to the folder containing the app.
++ Run the following command to clear the extended attributes:
+ 
+```
+xattr -cr picoforge.app
+```
+
+ + Right-click (or Control-click) the app and select Open.
 
 ## Linux
 
