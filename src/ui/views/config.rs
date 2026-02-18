@@ -5,7 +5,7 @@ use crate::ui::ui_types::{LedDriverType, UsbIdentityPreset};
 use gpui::*;
 use gpui_component::button::{ButtonCustomVariant, ButtonVariants};
 use gpui_component::{
-    ActiveTheme, Disableable, Icon, Theme,
+    ActiveTheme, Disableable, Icon, Theme, WindowExt,
     button::Button,
     input::{Input, InputState},
     select::{Select, SelectItem, SelectState},
@@ -206,7 +206,128 @@ impl ConfigView {
         }
     }
 
-    fn apply_changes(&mut self, _window: &mut Window, cx: &mut Context<Self>) {
+    fn write_config_to_device(
+        &mut self,
+        changes: AppConfigInput,
+        method: crate::device::types::DeviceMethod,
+        pin: Option<String>,
+        cx: &mut Context<Self>,
+    ) {
+        self.loading = true;
+        cx.notify();
+
+        let entity = cx.entity().downgrade();
+
+        self._task = Some(cx.spawn(async move |_, cx| {
+            let result = cx
+                .background_executor()
+                .spawn(async move { io::write_config(changes, method, pin) })
+                .await;
+
+            let new_status_result = if result.is_ok() {
+                Some(
+                    cx.background_executor()
+                        .spawn(async move { io::read_device_details() })
+                        .await,
+                )
+            } else {
+                None
+            };
+
+            let _ = entity.update(cx, |this, cx| {
+                this.loading = false;
+
+                match result {
+                    Ok(msg) => {
+                        log::info!("Success: {}", msg);
+
+                        if let Some(Ok(new_status)) = new_status_result {
+                            log::info!(
+                                "Refreshed device status. LED Steady: {}",
+                                new_status.config.led_steady
+                            );
+
+                            let config = &new_status.config;
+
+                            this.led_dimmable = config.led_dimmable;
+                            this.led_steady = config.led_steady;
+                            this.power_cycle = config.power_cycle_on_reset;
+                            this.enable_secp256k1 = config.enable_secp256k1;
+
+                            this.device_status = Some(new_status);
+                            cx.notify();
+                        }
+                    }
+                    Err(e) => {
+                        log::error!("Error saving config: {}", e);
+                    }
+                }
+
+                cx.notify();
+            });
+        }));
+    }
+
+    fn open_pin_dialog(
+        &mut self,
+        changes: AppConfigInput,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let pin_input = cx.new(|cx| {
+            InputState::new(window, cx)
+                .placeholder("Enter FIDO PIN")
+                .masked(true)
+        });
+        let view_handle = cx.entity().downgrade();
+
+        window.open_dialog(cx, move |dialog, _, _| {
+            let view_handle_for_footer = view_handle.clone();
+            let pin_input_for_footer = pin_input.clone();
+            let changes = changes.clone();
+
+            dialog
+                .title("Authentication Required")
+                .child(
+                    v_flex()
+                        .gap_4()
+                        .pb_4()
+                        .child("Enter your device PIN to apply changes.")
+                        .child(Input::new(&pin_input)),
+                )
+                .footer(move |_, _, _, _| {
+                    let view = view_handle_for_footer.clone();
+                    let input = pin_input_for_footer.clone();
+                    let changes = changes.clone();
+
+                    vec![
+                        Button::new("cancel")
+                            .label("Cancel")
+                            .on_click(|_, window, cx| {
+                                window.close_dialog(cx);
+                            }),
+                        Button::new("confirm").primary().label("Confirm").on_click(
+                            move |_, window, cx| {
+                                let pin = input.read(cx).text().to_string();
+                                if !pin.is_empty() {
+                                    window.close_dialog(cx);
+                                    let _ = view.update(cx, |this, cx| {
+                                        this.write_config_to_device(
+                                            changes.clone(),
+                                            crate::device::types::DeviceMethod::Fido,
+                                            Some(pin),
+                                            cx,
+                                        );
+                                    });
+                                }
+                            },
+                        ),
+                    ]
+                })
+        });
+    }
+
+    fn apply_changes(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         let status = if let Some(s) = &self.device_status {
             s
         } else {
@@ -302,60 +423,13 @@ impl ConfigView {
             return;
         }
 
-        self.loading = true;
-        cx.notify();
-
-        let entity = cx.entity().downgrade();
         let method = status.method.clone();
 
-        self._task = Some(cx.spawn(async move |_, cx| {
-            let result = cx
-                .background_executor()
-                .spawn(async move { io::write_config(changes, method, None) })
-                .await;
-
-            let new_status_result = if result.is_ok() {
-                Some(
-                    cx.background_executor()
-                        .spawn(async move { io::read_device_details() })
-                        .await,
-                )
-            } else {
-                None
-            };
-
-            let _ = entity.update(cx, |this, cx| {
-                this.loading = false;
-
-                match result {
-                    Ok(msg) => {
-                        log::info!("Success: {}", msg);
-
-                        if let Some(Ok(new_status)) = new_status_result {
-                            log::info!(
-                                "Refreshed device status. LED Steady: {}",
-                                new_status.config.led_steady
-                            );
-
-                            let config = &new_status.config;
-
-                            this.led_dimmable = config.led_dimmable;
-                            this.led_steady = config.led_steady;
-                            this.power_cycle = config.power_cycle_on_reset;
-                            this.enable_secp256k1 = config.enable_secp256k1;
-
-                            this.device_status = Some(new_status);
-                            cx.notify();
-                        }
-                    }
-                    Err(e) => {
-                        log::error!("Error saving config: {}", e);
-                    }
-                }
-
-                cx.notify();
-            });
-        }));
+        if method == crate::device::types::DeviceMethod::Fido {
+            self.open_pin_dialog(changes, window, cx);
+        } else {
+            self.write_config_to_device(changes, method, None, cx);
+        }
     }
 
     pub(crate) fn update_device_status(

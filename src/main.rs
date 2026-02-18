@@ -20,7 +20,7 @@ fn main() {
 
         cx.activate(true);
 
-        let mut window_size = size(px(1280.0), px(720.0));
+        let mut window_size = size(px(1344.0), px(756.0));
 
         // Basically, make sure that the window is max to max 85 percent size of the actual
         // monitor/display, so the window does not get too big on small monitors.

@@ -99,7 +99,15 @@ impl ApplicationRoot {
 
 impl Render for ApplicationRoot {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let target_width = if self.collapsed { px(48.) } else { px(255.) };
+        let window_width = window.bounds().size.width;
+        let is_window_wide = window_width > px(800.0);
+        let is_sidebar_collapsed = self.collapsed || !is_window_wide;
+
+        let target_width = if is_sidebar_collapsed {
+            px(48.)
+        } else {
+            px(255.)
+        };
 
         if (self.sidebar_width - target_width).abs() > px(0.1) {
             self.sidebar_width = self.sidebar_width + (target_width - self.sidebar_width) * 0.2;
@@ -117,7 +125,7 @@ impl Render for ApplicationRoot {
                     AppSidebar::new(
                         self.active_view,
                         self.sidebar_width,
-                        self.collapsed,
+                        is_sidebar_collapsed,
                         self.state.clone(),
                     )
                     .on_select(|this: &mut Self, view, _, _| {
