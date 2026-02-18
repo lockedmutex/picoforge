@@ -15,11 +15,12 @@ let
     wayland-protocols
     libunwind
     libdrm
-    libX11
-    libXcursor
-    libXi
-    libXrandr
+    libx11
+    libxcursor
+    libxi
+    libxrandr
     libxcb
+    freetype
   ];
 
   packages = with pkgs; [
