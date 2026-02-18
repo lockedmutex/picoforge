@@ -72,6 +72,10 @@ install -m 644 static/appIcons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %{_datadir}/icons/hicolor/scalable/apps/in.suyogtandel.picoforge.svg
 
 %changelog
+* Wed Feb 18 2026 Suyog Tandel <git@suyogtandel.in> 0.4.0-2
+- chore(ci/cd): update release workflow to use cargo packager and drop appimage
+  build (git@suyogtandel.in)
+
 * Wed Feb 18 2026 Suyog Tandel <git@suyogtandel.in> 0.4.0-1
 - chore: cleanup spec file (git@suyogtandel.in)
 - chore(packaging): update specfile with gpui deps for rpm build
