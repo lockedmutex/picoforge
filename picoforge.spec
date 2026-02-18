@@ -21,7 +21,6 @@ BuildRequires:  pkgconfig(xcb-render)
 BuildRequires:  pkgconfig(xcb-shape)
 BuildRequires:  pkgconfig(xkbcommon)
 BuildRequires:  pkgconfig(xkbcommon-x11)
-# Verify if these are needed for your specific GPUI usage or if they are pulled in transitively
 # BuildRequires:  pkgconfig(vulkan)
 # BuildRequires:  pkgconfig(wayland-client)
 
