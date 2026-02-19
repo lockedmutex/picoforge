@@ -88,7 +88,10 @@ jobs:
           echo "version=$version" >> $GITHUB_ENV
 
       - name: install cargo-packager
-        run: cargo install cargo-packager --locked
+        uses: taiki-e/install-action@cargo-packager
+
+      - name: Build Binary
+        run: cargo build --release ${{ matrix.args }}
 
       # - name: Build and Package (Linux)
       #   if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-24.04-arm'
@@ -111,11 +114,23 @@ jobs:
           prerelease: false
           files: |
             target/release/*.deb
+            target/release/*.appimage
+            target/release/*.AppImage
             target/release/*.tar.gz
             target/release/*.msi
             target/release/*.exe
             target/release/*.dmg
             target/release/*.app
+            target/x86_64-apple-darwin/release/*.dmg
+            target/aarch64-apple-darwin/release/*.dmg
+            target/x86_64-apple-darwin/release/*.app
+            target/aarch64-apple-darwin/release/*.app
+            target/x86_64-pc-windows-msvc/release/*.msi
+            target/x86_64-pc-windows-msvc/release/*.exe
+            target/i686-pc-windows-msvc/release/*.msi
+            target/i686-pc-windows-msvc/release/*.exe
+            target/aarch64-pc-windows-msvc/release/*.msi
+            target/aarch64-pc-windows-msvc/release/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
