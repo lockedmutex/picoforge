@@ -28,7 +28,7 @@ icons = [
     "./static/appIcons/StoreLogo.png",
 ]
 
-beforePackagingCommand = "cargo build --release"
+# beforePackagingCommand = "cargo build --release"
 
 binaries = [{ main = true, name = "picoforge" }]
 # outDir = "packaging/cargoPackager"

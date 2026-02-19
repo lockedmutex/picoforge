@@ -45,4 +45,4 @@ opt-level = 3     # Prioritizes speed. Use `z` if you prefer small binary size.
 strip = true      # Ensures debug symbols are removed.
 
 [package.metadata.packager]
-before-packaging-command = "cargo build --release"
+# before-packaging-command = "cargo build --release"
