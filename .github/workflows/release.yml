@@ -43,6 +43,11 @@ jobs:
             ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' ||
             matrix.platform == 'windows-latest' && 'x86_64-pc-windows-msvc,i686-pc-windows-msvc,aarch64-pc-windows-msvc' || '' }}
 
+      - name: Cache Cargo registry and target
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.platform }}-${{ matrix.args }}
+
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-24.04-arm'
         run: |
