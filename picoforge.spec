@@ -72,6 +72,10 @@ install -m 644 static/appIcons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %{_datadir}/icons/hicolor/scalable/apps/in.suyogtandel.picoforge.svg
 
 %changelog
+* Fri Feb 27 2026 Suyog Tandel <git@suyogtandel.in> 0.4.1-3
+- chore: sync spec to 0.4.1 [skip ci] (git@suyogtandel.in)
+- chore(pkg): change appimage naming in release workflow (git@suyogtandel.in)
+
 * Fri Feb 27 2026 Suyog Tandel <git@suyogtandel.in> 0.4.1-2
 - chore: sync spec to 0.4.1 [skip ci] (git@suyogtandel.in)
 - fix(pkg): windows installation binaries glob in workflow (git@suyogtandel.in)
