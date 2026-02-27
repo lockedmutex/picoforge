@@ -72,6 +72,24 @@ install -m 644 static/appIcons/in.suyogtandel.picoforge.svg %{buildroot}%{_datad
 %{_datadir}/icons/hicolor/scalable/apps/in.suyogtandel.picoforge.svg
 
 %changelog
+* Fri Feb 27 2026 Suyog Tandel <git@suyogtandel.in> 0.4.1-2
+- chore: sync spec to 0.4.1 [skip ci] (git@suyogtandel.in)
+- fix(pkg): windows installation binaries glob in workflow (git@suyogtandel.in)
+- feat(pkg): build flatpaks parallel to other workflow steps
+  (git@suyogtandel.in)
+- fix: flatpak manifest pcsc build error (git@suyogtandel.in)
+- fix(pkg): flatpak build script failing due to absence of zsh
+  (git@suyogtandel.in)
+- feat(pkg): add flatpak build step to release workflow (git@suyogtandel.in)
+- feat(pkg): add flatpak build manifest (git@suyogtandel.in)
+- chore: Update funding.yml with donation links (git@suyogtandel.in)
+- chore: delete old issue template (git@suyogtandel.in)
+- chore: Update issue and feature templates (suyogtandel12@gmail.com)
+- Update issue templates (suyogtandel12@gmail.com)
+- chore: update github PR and ISSUE templates (git@suyogtandel.in)
+- fix #72 : sidebar toggle button redesign (fabrice.bellamy@distrilab.fr)
+- picoforge: 0.4.0 -> 0.4.1 (github-actions[bot]@users.noreply.github.com)
+
 * Sun Feb 22 2026 Suyog Tandel <git@suyogtandel.in> 0.4.1-1
 - chore: sync spec to 0.4.1 [skip ci] (git@suyogtandel.in)
 - chore: bump app version to 0.4.1 (git@suyogtandel.in)
